@@ -10,17 +10,20 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
-        /* Embedded CSS styles */
-        
+        /* Estilos Gerais */
         body {
             background: linear-gradient(135deg, #6dd5ed, #2193b0);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
 
+        /* Estilos do Dashboard */
+        .dashboard-container {
+            max-width: 1200px;
+            display: none; /* Começa escondido para a splash screen aparecer primeiro */
+        }
+        
         .glass-card {
             background-color: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
@@ -34,11 +37,7 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             color: white;
         }
-
-        .glass-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
+        .glass-input::placeholder { color: rgba(255, 255, 255, 0.6); }
         .glass-input:focus {
             background-color: rgba(255, 255, 255, 0.2);
             border-color: rgba(255, 255, 255, 0.5);
@@ -46,155 +45,204 @@
             color: white;
         }
 
-        .icon-large {
-            font-size: 2.5rem;
+        .icon-large { font-size: 2.5rem; }
+        .text-white { color: #f8f9fa !important; }
+        .text-white-50 { color: rgba(248, 249, 250, 0.75) !important; }
+        .btn-primary { background-color: #007bff; border-color: #007bff; }
+        .btn-primary:hover { background-color: #0056b3; border-color: #0056b3; }
+
+        /* Estilos da Tela de Splash */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #6dd5ed, #2193b0);
+            z-index: 9999; display: flex; justify-content: center; align-items: center;
+            text-align: center; color: white; opacity: 1; visibility: visible;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        }
+        #splash-screen.hidden { opacity: 0; visibility: hidden; }
+        .splash-content { max-width: 500px; padding: 20px; }
+        .splash-logo { width: 150px; margin-bottom: 20px; }
+        .splash-description { font-size: 1.1rem; line-height: 1.6; color: rgba(255, 255, 255, 0.85); }
+        .sponsor-section { margin-top: 40px; border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 20px; }
+        .sponsor-text { display: block; font-size: 0.9rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 10px; }
+        .sponsor-logo { max-width: 120px; opacity: 0.8; }
+
+        /* Estilos do Botão de Entrada da Splash Screen */
+        #enter-btn {
+            position: fixed; bottom: 40px; right: 40px;
+            width: 60px; height: 60px;
+            border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px);
+            color: white; font-size: 2rem; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+        #enter-btn:hover { background-color: rgba(255, 255, 255, 0.3); transform: scale(1.1); animation: none; }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
         }
 
-        .text-white {
-            color: #f8f9fa !important;
+        #dashboard-footer {
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.2); /* Linha sutil de separação */
         }
 
-        .text-white-50 {
-            color: rgba(248, 249, 250, 0.75) !important;
-        }
-
-        .dashboard-container {
-            max-width: 1200px;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-
-        /* Style to center the spinner */
-        #loading-spinner {
+        .footer-logos {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100%;
+            gap: 30px; /* Espaço entre as logos */
+        }
+
+        .footer-logo {
+            height: 35px; /* << AQUI DEFINIMOS O TAMANHO PEQUENO DAS LOGOS */
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-logo:hover {
+            opacity: 1; /* Efeito suave ao passar o mouse */
         }
     </style>
 </head>
 <body>
 
-    <div class="container my-5 dashboard-container">
-        <h1 class="text-center text-white mb-5"><p>Tupâ Dashboard </p><span id="location-display"></span><p><span id="date-display"></span></p></h1>
+    <div id="splash-screen">
+        <div class="splash-content">
+            <img src="tupa.png" alt="Logo Tupã" class="splash-logo">
+            <p class="splash-description my-4">
+                Sua plataforma de visualização de dados climáticos.
+            </p>
+            <div class="sponsor-section">
+                <span class="sponsor-text">Patrocinado por:</span>
+                <img src="space_apps.png" alt="Logo do Patrocinador" class="sponsor-logo">
+            </div>
+        </div>
+        <button id="enter-btn">
+            <i class="bi bi-arrow-right-short"></i>
+        </button>
+    </div>
 
+    <div class="container my-5 dashboard-container">
+        <h1 class="text-center text-white mb-5"><p>Tupã Dashboard </p><span id="location-display"></span><p><span id="date-display"></span></p></h1>
         <div class="row">
             <div class="col-lg-4 mb-4">
                 <div class="card glass-card p-4 h-100 d-flex flex-column justify-content-between">
                     <form id="weather-form">
-                        <h5 class="card-title text-white mb-3">Search Weather by Location</h5>
+                        <h5 class="card-title text-white mb-3">Buscar Clima por Localização</h5>
                         <div class="mb-3">
-                            <label for="location_input" class="form-label text-white-50">Place Name</label>
-                            <input type="text" class="form-control glass-input" id="location_input" name="location_input" placeholder="Ex: Juazeiro do Norte, Brazil">
+                            <label for="location_input" class="form-label text-white-50">Nome do Local</label>
+                            <input type="text" class="form-control glass-input" id="location_input" name="location_input" placeholder="Ex: Fortaleza, Brazil">
                         </div>
                         <div class="mb-3">
-                            <label for="date_input" class="form-label text-white-50">Date</label>
+                            <label for="date_input" class="form-label text-white-50">Data</label>
                             <input type="date" class="form-control glass-input" id="date_input" name="date_input">
                         </div>
                         <div class="mb-3" id="coords-display-container" style="display: none;">
-                            <label class="form-label text-white-50">Coordinates</label>
+                            <label class="form-label text-white-50">Coordenadas</label>
                             <p class="text-white mb-0" id="coords-display">Lat: --, Lon: --</p>
                         </div>
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Update</button>
-                            <button type="button" class="btn btn-success" id="download-csv-btn" disabled>Download CSV</button>
+                            <button type="submit" class="btn btn-primary">Atualizar</button>
+                            <button type="button" class="btn btn-success" id="download-csv-btn" disabled>Baixar CSV</button>
                         </div>
                     </form>
                 </div>
             </div>
-
             <div class="col-lg-8">
                 <div id="loading-spinner" class="d-flex justify-content-center d-none">
                     <div class="spinner-border text-white" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
-
                 <div class="row row-cols-1 row-cols-md-3 g-4" id="weather-data-container">
                     <div class="col">
                         <div class="card glass-card h-100">
                             <div class="card-body text-white">
-                                <p class="card-text text-white-50 small">Temperature</p>
+                                <p class="card-text text-white-50 small">Temperatura</p>
                                 <div class="d-flex align-items-center mb-2">
                                     <i class="bi bi-thermometer-half icon-large me-2"></i> <h3 class="card-title mb-0" id="current-temp">--°C</h3>
                                 </div>
-                                <p class="card-text small text-white-50">
-                                    Max. <span id="max-temp">--</span>, Min. <span id="min-temp">--</span>
-                                </p>
+                                <p class="card-text small text-white-50">Máx. <span id="max-temp">--</span>, Mín. <span id="min-temp">--</span></p>
                             </div>
                         </div>
                     </div>
-
                     <div class="col">
                         <div class="card glass-card h-100">
                             <div class="card-body text-white">
-                                <p class="card-text text-white-50 small">Humidity</p>
+                                <p class="card-text text-white-50 small">Humidade</p>
                                 <div class="d-flex align-items-center mb-2">
                                     <i class="bi bi-cloud-haze2-fill icon-large me-2"></i> <h3 class="card-title mb-0" id="current-humidity">--%</h3>
                                 </div>
-                                <p class="card-text small text-white-50">View data</p>
+                                <p class="card-text small text-white-50">Ver dados</p>
                             </div>
                         </div>
                     </div>
-
                     <div class="col">
                         <div class="card glass-card h-100">
                             <div class="card-body text-white">
-                                <p class="card-text text-white-50 small">Wind</p>
+                                <p class="card-text text-white-50 small">Vento</p>
                                 <div class="d-flex align-items-center mb-2">
                                     <i class="bi bi-wind icon-large me-2"></i> <h3 class="card-title mb-0" id="current-wind">-- m/s</h3>
                                 </div>
-                                <p class="card-text small text-white-50">View data</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="card glass-card h-100">
-                            <div class="card-body text-white">
-                                <p class="card-text text-white-50 small">Dew Point</p>
-                                <div class="d-flex align-items-center mb-2">
-                                    <i class="bi bi-thermometer-snow icon-large me-2"></i>
-                                    <h3 class="card-title mb-0" id="dew-point">--°C</h3>
-                                </div>
-                                <p class="card-text small text-white-50">View data</p>
+                                <p class="card-text small text-white-50">Ver dados</p>
                             </div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="card glass-card h-100">
                             <div class="card-body text-white">
-                                <p class="card-text text-white-50 small">Pressure</p>
+                                <p class="card-text text-white-50 small">Ponto de Orvalho</p>
                                 <div class="d-flex align-items-center mb-2">
-                                    <i class="bi bi-speedometer icon-large me-2"></i>
-                                    <h3 class="card-title mb-0" id="pressure">-- hPa</h3>
+                                    <i class="bi bi-thermometer-snow icon-large me-2"></i><h3 class="card-title mb-0" id="dew-point">--°C</h3>
                                 </div>
-                                <p class="card-text small text-white-50">View data</p>
+                                <p class="card-text small text-white-50">Ver dados</p>
                             </div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="card glass-card h-100">
                             <div class="card-body text-white">
-                                <p class="card-text text-white-50 small">Rain Probability</p>
+                                <p class="card-text text-white-50 small">Pressão</p>
                                 <div class="d-flex align-items-center mb-2">
-                                    <i class="bi bi-cloud-rain icon-large me-2"></i>
-                                    <h3 class="card-title mb-0" id="rain-prob">--%</h3>
+                                    <i class="bi bi-speedometer icon-large me-2"></i><h3 class="card-title mb-0" id="pressure">-- hPa</h3>
                                 </div>
-                                <p class="card-text small text-white-50">Calculated based on humidity and wind data.</p>
+                                <p class="card-text small text-white-50">Ver dados</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card glass-card h-100">
+                            <div class="card-body text-white">
+                                <p class="card-text text-white-50 small">Prob. de Chuva</p>
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-cloud-rain icon-large me-2"></i><h3 class="card-title mb-0" id="rain-prob">--%</h3>
+                                </div>
+                                <p class="card-text small text-white-50">Calculado localmente</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    </div> 
+        <footer id="dashboard-footer" class="text-center mt-5">
+            <p class="text-white-50 small mb-2">Desenvolvido para</p>
+            <div class="footer-logos">
+                <a href="#">
+                    <img src="tupa.png" alt="Logo Tupã" class="footer-logo">
+                </a>
+                <a href="https://www.spaceappschallenge.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="space_apps.png" alt="Logo NASA Space Apps Challenge" class="footer-logo">
+                </a>
+            </div>
+        </footer>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -348,6 +396,18 @@
             
             return Math.round(Math.max(0, Math.min(1, p)) * 100);
         }
+
+        window.addEventListener('load', function() {
+            const splashScreen = document.getElementById('splash-screen');
+            const dashboardContainer = document.querySelector('.dashboard-container');
+            const enterButton = document.getElementById('enter-btn'); // Pega o botão
+
+            // Adiciona um "ouvinte" para o evento de clique no botão
+            enterButton.addEventListener('click', () => {
+                splashScreen.classList.add('hidden'); // Esconde a splash screen
+                dashboardContainer.style.display = 'block'; // Mostra o dashboard
+            });
+        });
         
         function updateUI(data) {
             document.getElementById('current-temp').textContent = `${data.T2M.toFixed(1)}°C`;
